@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  */
 @EnableJpaAuditing
 @SpringBootApplication
-public class ShoppingcartApplication
+public class ShoppingCartApplication
 {
     /**
      * Main method to start the application.
@@ -18,8 +18,8 @@ public class ShoppingcartApplication
      */
     public static void main(String[] args)
     {
-        SpringApplication.run(ShoppingcartApplication.class,
-                              args);
+        // now run the real application!
+        SpringApplication.run(ShoppingCartApplication.class,
+            args);
     }
-
 }

@@ -2,44 +2,39 @@ package com.lambdaschool.shoppingcart.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
 @JsonIgnoreProperties(value = "hasprice")
 public class Product
-        extends Auditable
+    extends Auditable
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long productid;
 
     @Column(nullable = false,
-            unique = true)
+        unique = true)
     private String name;
 
     @Transient
     public boolean hasprice = false;
+
     private double price;
 
     private String description;
+
     private String comments;
 
     @OneToMany(mappedBy = "product",
-            cascade = CascadeType.ALL)
+        cascade = CascadeType.ALL,
+        orphanRemoval = true)
     @JsonIgnoreProperties(value = "product",
-            allowSetters = true)
-    private List<CartItem> carts = new ArrayList<>();
+        allowSetters = true)
+    private Set<CartItem> carts = new HashSet<>();
 
     public Product()
     {
@@ -97,12 +92,12 @@ public class Product
         this.comments = comments;
     }
 
-    public List<CartItem> getCarts()
+    public Set<CartItem> getCarts()
     {
         return carts;
     }
 
-    public void setCarts(List<CartItem> carts)
+    public void setCarts(Set<CartItem> carts)
     {
         this.carts = carts;
     }

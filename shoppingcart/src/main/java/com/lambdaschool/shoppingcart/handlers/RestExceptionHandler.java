@@ -3,6 +3,7 @@ package com.lambdaschool.shoppingcart.handlers;
 import com.lambdaschool.shoppingcart.exceptions.ResourceFoundException;
 import com.lambdaschool.shoppingcart.exceptions.ResourceNotFoundException;
 import com.lambdaschool.shoppingcart.models.ErrorDetail;
+import com.lambdaschool.shoppingcart.services.HelperFunctions;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,13 +42,13 @@ import java.util.Date;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class RestExceptionHandler
-        extends ResponseEntityExceptionHandler
+    extends ResponseEntityExceptionHandler
 {
     /**
      * Connects this class with the Helper Functions
      */
     @Autowired
-    private HelperFunctions helper;
+    private HelperFunctions helperFunctions;
 
     /**
      * The constructor for the RestExceptionHandler. Currently we do not do anything special. We just call the parent constructor.
@@ -72,12 +73,12 @@ public class RestExceptionHandler
         errorDetail.setTitle("Resource Not Found");
         errorDetail.setDetail(rnfe.getMessage());
         errorDetail.setDeveloperMessage(rnfe.getClass()
-                                                .getName());
-        errorDetail.setErrors(helper.getConstraintViolation(rnfe));
+            .getName());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(rnfe));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    HttpStatus.NOT_FOUND);
+            null,
+            HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -95,12 +96,12 @@ public class RestExceptionHandler
         errorDetail.setTitle("Unexpected Resource");
         errorDetail.setDetail(rfe.getMessage());
         errorDetail.setDeveloperMessage(rfe.getClass()
-                                                .getName());
-        errorDetail.setErrors(helper.getConstraintViolation(rfe));
+            .getName());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(rfe));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    HttpStatus.BAD_REQUEST);
+            null,
+            HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -115,11 +116,11 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
-            Exception ex,
-            Object body,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        Exception ex,
+        Object body,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -127,12 +128,12 @@ public class RestExceptionHandler
         errorDetail.setTitle("Rest Internal Exception");
         errorDetail.setDetail(ex.getMessage());
         errorDetail.setDeveloperMessage(ex.getClass()
-                                                .getName());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+            .getName());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /*********************
@@ -151,10 +152,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
-            HttpRequestMethodNotSupportedException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        HttpRequestMethodNotSupportedException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -162,11 +163,11 @@ public class RestExceptionHandler
         errorDetail.setTitle("Incorrect method: " + ex.getMethod());
         errorDetail.setDetail("Path: " + request.getDescription(false) + " | Supported Methods are: " + Arrays.toString(ex.getSupportedMethods()));
         errorDetail.setDeveloperMessage("HTTP Method Not Valid for Endpoint (check for valid URI and proper HTTP Method)");
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -180,10 +181,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
-            HttpMediaTypeNotSupportedException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        HttpMediaTypeNotSupportedException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -191,11 +192,11 @@ public class RestExceptionHandler
         errorDetail.setTitle("Incorrect content type: " + ex.getContentType());
         errorDetail.setDetail("Path: " + request.getDescription(false) + " | Supported Content / Media Types are: " + ex.getSupportedMediaTypes());
         errorDetail.setDeveloperMessage("Content / Media Type Not Valid for Endpoint (check for valid URI and proper content / media type)");
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -211,10 +212,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(
-            HttpMediaTypeNotAcceptableException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        HttpMediaTypeNotAcceptableException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -222,11 +223,11 @@ public class RestExceptionHandler
         errorDetail.setTitle("Unacceptable content type: " + ex.getMessage());
         errorDetail.setDetail("Path: " + request.getDescription(false) + " | Supported Content / Media Types are: " + ex.getSupportedMediaTypes());
         errorDetail.setDeveloperMessage("Content / Media Type Not Valid for Endpoint (check for valid URI and proper content / media type)");
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -240,10 +241,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleMissingPathVariable(
-            MissingPathVariableException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        MissingPathVariableException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -251,12 +252,12 @@ public class RestExceptionHandler
         errorDetail.setTitle(ex.getVariableName() + " Missing Path Variable");
         errorDetail.setDetail(ex.getMessage());
         errorDetail.setDeveloperMessage(ex.getClass()
-                                                .getName());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+            .getName());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -270,10 +271,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
-            MissingServletRequestParameterException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        MissingServletRequestParameterException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -281,11 +282,11 @@ public class RestExceptionHandler
         errorDetail.setTitle("Parameter Missing for " + "Path: " + request.getDescription(false));
         errorDetail.setDetail("Parameter Missing: " + ex.getParameterName() + " Type: " + ex.getParameterType());
         errorDetail.setDeveloperMessage(ex.getMessage() + " " + ex.getClass());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -299,10 +300,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleServletRequestBindingException(
-            ServletRequestBindingException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        ServletRequestBindingException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -310,12 +311,12 @@ public class RestExceptionHandler
         errorDetail.setTitle("Path: " + request.getDescription(false) + " Request Binding Exception");
         errorDetail.setDetail(ex.getMessage());
         errorDetail.setDeveloperMessage(ex.getClass()
-                                                .getName());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+            .getName());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -329,10 +330,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleConversionNotSupported(
-            ConversionNotSupportedException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        ConversionNotSupportedException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -340,12 +341,12 @@ public class RestExceptionHandler
         errorDetail.setTitle("Path: " + request.getDescription(false) + " Conversion Not Support");
         errorDetail.setDetail(ex.getMessage());
         errorDetail.setDeveloperMessage(ex.getClass()
-                                                .getName() + " " + ex.getMostSpecificCause());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+            .getName() + " " + ex.getMostSpecificCause());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -359,10 +360,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(
-            TypeMismatchException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        TypeMismatchException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -370,12 +371,12 @@ public class RestExceptionHandler
         errorDetail.setTitle("Path: " + request.getDescription(false) + " Type Mismatch");
         errorDetail.setDetail(ex.getMessage());
         errorDetail.setDeveloperMessage(ex.getClass()
-                                                .getName() + " " + ex.getMostSpecificCause());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+            .getName() + " " + ex.getMostSpecificCause());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -389,10 +390,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
-            HttpMessageNotReadableException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        HttpMessageNotReadableException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -400,12 +401,12 @@ public class RestExceptionHandler
         errorDetail.setTitle("Path: " + request.getDescription(false) + " Message Not Readable");
         errorDetail.setDetail(ex.getMessage());
         errorDetail.setDeveloperMessage(ex.getClass()
-                                                .getName() + " " + ex.getMostSpecificCause());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+            .getName() + " " + ex.getMostSpecificCause());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -419,10 +420,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotWritable(
-            HttpMessageNotWritableException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        HttpMessageNotWritableException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -430,12 +431,12 @@ public class RestExceptionHandler
         errorDetail.setTitle("Path: " + request.getDescription(false) + " Message Not Writable");
         errorDetail.setDetail(ex.getMessage());
         errorDetail.setDeveloperMessage(ex.getClass()
-                                                .getName() + " " + ex.getMostSpecificCause());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+            .getName() + " " + ex.getMostSpecificCause());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -449,10 +450,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        MethodArgumentNotValidException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -460,12 +461,12 @@ public class RestExceptionHandler
         errorDetail.setTitle("Method Argument Not Valid");
         errorDetail.setDetail(request.getDescription(false) + " | parameter: " + ex.getParameter());
         errorDetail.setDeveloperMessage(ex.getBindingResult()
-                                                .toString());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+            .toString());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -479,10 +480,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestPart(
-            MissingServletRequestPartException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        MissingServletRequestPartException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -490,12 +491,12 @@ public class RestExceptionHandler
         errorDetail.setTitle(request.getDescription(false) + " Missing Servlet Request");
         errorDetail.setDetail("Request Part Name: " + ex.getRequestPartName() + " | " + ex.getMessage());
         errorDetail.setDeveloperMessage(ex.getClass()
-                                                .getName());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+            .getName());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -509,10 +510,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleBindException(
-            BindException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        BindException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -520,12 +521,12 @@ public class RestExceptionHandler
         errorDetail.setTitle("Bind Exception");
         errorDetail.setDetail(ex.getMessage());
         errorDetail.setDeveloperMessage(ex.getClass()
-                                                .getName() + " " + ex.getBindingResult());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+            .getName() + " " + ex.getBindingResult());
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
 
@@ -543,10 +544,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(
-            NoHandlerFoundException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request)
+        NoHandlerFoundException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -554,11 +555,11 @@ public class RestExceptionHandler
         errorDetail.setTitle("Rest Endpoint Not Valid");
         errorDetail.setDetail(request.getDescription(false));
         errorDetail.setDeveloperMessage("Rest Handler Not Found (check for valid URI)");
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 
     /**
@@ -572,10 +573,10 @@ public class RestExceptionHandler
      */
     @Override
     protected ResponseEntity<Object> handleAsyncRequestTimeoutException(
-            AsyncRequestTimeoutException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest webRequest)
+        AsyncRequestTimeoutException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest webRequest)
     {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date());
@@ -583,10 +584,10 @@ public class RestExceptionHandler
         errorDetail.setTitle("Async Request Timeout Error");
         errorDetail.setDetail("path: " + webRequest.getDescription(false));
         errorDetail.setDeveloperMessage(ex.getMessage());
-        errorDetail.setErrors(helper.getConstraintViolation(ex));
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
 
         return new ResponseEntity<>(errorDetail,
-                                    null,
-                                    status);
+            null,
+            status);
     }
 }

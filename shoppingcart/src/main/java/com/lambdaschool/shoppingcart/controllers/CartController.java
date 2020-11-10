@@ -1,86 +1,62 @@
 package com.lambdaschool.shoppingcart.controllers;
 
-import com.lambdaschool.shoppingcart.models.Cart;
-import com.lambdaschool.shoppingcart.models.Product;
+import com.lambdaschool.shoppingcart.models.CartItem;
 import com.lambdaschool.shoppingcart.models.User;
-import com.lambdaschool.shoppingcart.services.CartService;
+import com.lambdaschool.shoppingcart.services.CartItemService;
+import com.lambdaschool.shoppingcart.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/carts")
 public class CartController
 {
     @Autowired
-    private CartService cartService;
+    private CartItemService cartItemService;
 
-    @GetMapping(value = "/user", produces = {"application/json"})
-    public ResponseEntity<?> listAllCarts(@PathVariable long userid)
+    @Autowired
+    private UserService userService;
+
+    @GetMapping(value = "/user/{userid}",
+        produces = {"application/json"})
+    public ResponseEntity<?> listCartItemsByUserId(
+        @PathVariable
+            long userid)
     {
-        List<Cart> myCarts = cartService.findAllByUserId(userid);
-        return new ResponseEntity<>(myCarts, HttpStatus.OK);
+        User u = userService.findUserById(userid);
+        return new ResponseEntity<>(u,
+            HttpStatus.OK);
     }
 
-    @GetMapping(value = "/cart/{cartId}",
-            produces = {"application/json"})
-    public ResponseEntity<?> getCartById(
-            @PathVariable
-                    Long cartId)
+    @PutMapping(value = "/add/user/{userid}/product/{productid}",
+        produces = {"application/json"})
+    public ResponseEntity<?> addToCart(
+        @PathVariable
+            long userid,
+        @PathVariable
+            long productid)
     {
-        Cart p = cartService.findCartById(cartId);
-        return new ResponseEntity<>(p,
-                                    HttpStatus.OK);
+        CartItem addCartTtem = cartItemService.addToCart(userid,
+            productid,
+            "I am not working");
+        return new ResponseEntity<>(addCartTtem,
+            HttpStatus.OK);
     }
 
-    @PostMapping(value = "/create/user/{userid}/product/{productid}")
-    public ResponseEntity<?> addNewCart(@PathVariable long userid,
-                                        @PathVariable long productid)
+    @DeleteMapping(value = "/remove/user/{userid}/product/{productid}",
+        produces = {"application/json"})
+    public ResponseEntity<?> removeFromCart(
+        @PathVariable
+            long userid,
+        @PathVariable
+            long productid)
     {
-        User dataUser = new User();
-        dataUser.setUserid(userid);
-
-        Product dataProduct = new Product();
-        dataProduct.setProductid(productid);
-
-        cartService.save(dataUser, dataProduct);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @PutMapping(value = "/update/cart/{cartid}/product/{productid}")
-    public ResponseEntity<?> updateCart(@PathVariable long cartid,
-                                        @PathVariable long productid)
-    {
-        Cart dataCart = new Cart();
-        dataCart.setCartid(cartid);
-
-        Product dataProduct = new Product();
-        dataProduct.setProductid(productid);
-
-        cartService.save(dataCart, dataProduct);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @DeleteMapping(value = "/delete/cart/{cartid}/product/{productid}")
-    public ResponseEntity<?> deleteFromCart(@PathVariable long cartid,
-                                            @PathVariable long productid)
-    {
-        Cart dataCart = new Cart();
-        dataCart.setCartid(cartid);
-
-        Product dataProduct = new Product();
-        dataProduct.setProductid(productid);
-
-        cartService.delete(dataCart, dataProduct);
-        return new ResponseEntity<>(HttpStatus.OK);
+        CartItem removeCartItem = cartItemService.removeFromCart(userid,
+            productid,
+            "I am still not working");
+        return new ResponseEntity<>(removeCartItem,
+            HttpStatus.OK);
     }
 }

@@ -49,6 +49,6 @@ public interface ProductService
      * @return The complete product with the field changes
      */
     Product update(
-            long id,
-            Product product);
+        long id,
+        Product product);
 }

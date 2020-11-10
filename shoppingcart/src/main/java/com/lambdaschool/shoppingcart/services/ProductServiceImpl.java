@@ -3,8 +3,8 @@ package com.lambdaschool.shoppingcart.services;
 import com.lambdaschool.shoppingcart.exceptions.ResourceFoundException;
 import com.lambdaschool.shoppingcart.exceptions.ResourceNotFoundException;
 import com.lambdaschool.shoppingcart.models.Product;
-import com.lambdaschool.shoppingcart.repositories.CartRepository;
-import com.lambdaschool.shoppingcart.repositories.ProductRepository;
+import com.lambdaschool.shoppingcart.repository.CartItemRepository;
+import com.lambdaschool.shoppingcart.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service(value = "productService")
 public class ProductServiceImpl
-        implements ProductService
+    implements ProductService
 {
     /**
      * Connects this service to the product repository
@@ -23,7 +23,7 @@ public class ProductServiceImpl
     private ProductRepository productrepos;
 
     @Autowired
-    private CartRepository cartrepos;
+    private CartItemRepository cartrepos;
 
     /**
      * Connects this service to the auditing service in order to find the current user
@@ -40,8 +40,8 @@ public class ProductServiceImpl
          * iterate over the iterator set and add each element to an array list.
          */
         productrepos.findAll()
-                .iterator()
-                .forEachRemaining(list::add);
+            .iterator()
+            .forEachRemaining(list::add);
         return list;
     }
 
@@ -49,7 +49,7 @@ public class ProductServiceImpl
     public Product findProductById(long id)
     {
         return productrepos.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product id " + id + " not found!"));
+            .orElseThrow(() -> new ResourceNotFoundException("Product id " + id + " not found!"));
     }
 
     @Transactional
@@ -57,9 +57,8 @@ public class ProductServiceImpl
     public void delete(long id)
     {
         productrepos.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product id " + id + " not found!"));
+            .orElseThrow(() -> new ResourceNotFoundException("Product id " + id + " not found!"));
         productrepos.deleteById(id);
-        cartrepos.removeCartWithNoProducts();
     }
 
     @Transactional
@@ -67,28 +66,40 @@ public class ProductServiceImpl
     public Product save(Product product)
     {
         if (product.getCarts()
-                .size() > 0)
+            .size() > 0)
         {
             throw new ResourceFoundException("Carts are not updated through Products");
         }
-        ;
 
-        return productrepos.save(product);
+        Product newProduct = new Product();
+
+        if (product.getProductid() != 0)
+        {
+            newProduct = productrepos.findById(product.getProductid())
+                .orElseThrow(() -> new ResourceNotFoundException("Product id " + product.getProductid() + " not found!"));
+        }
+
+        newProduct.setName(product.getName());
+        newProduct.setDescription(product.getDescription());
+        newProduct.setComments(product.getComments());
+        newProduct.setPrice(product.getPrice());
+        return productrepos.save(newProduct);
     }
 
     @Transactional
     @Override
-    public Product update(long id,
-                          Product product)
+    public Product update(
+        long id,
+        Product product)
     {
         if (product.getCarts()
-                .size() > 0)
+            .size() > 0)
         {
             throw new ResourceFoundException("Carts cannot be updated through this process");
         }
 
         Product currentProduct = productrepos.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product id " + id + " not found!"));
+            .orElseThrow(() -> new ResourceNotFoundException("Product id " + id + " not found!"));
 
         if (product.getName() != null)
         {
@@ -110,13 +121,6 @@ public class ProductServiceImpl
             currentProduct.setComments(product.getComments());
         }
 
-        productrepos.updateProductInformation(userAuditing.getCurrentAuditor()
-                                                      .get(),
-                                              id,
-                                              currentProduct.getName(),
-                                              currentProduct.getPrice(),
-                                              currentProduct.getDescription(),
-                                              currentProduct.getComments());
-        return findProductById(id);
+        return productrepos.save(currentProduct);
     }
 }
